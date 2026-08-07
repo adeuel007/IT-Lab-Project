@@ -24,3 +24,27 @@ Some of the biggest lessons from the build so far: (This will be a living docume
 --Pretty self-explanatory.
 
 -Separating Internet-facing and domain networks closely mirrors enterprise designs.
+
+---8/7/26---
+Troubleshooting due to windows update freezing VM. Force restart did not resolve. Rolled back to previous checkpoint. Verified state of the Domain Controller: Learned OUs and Groups were missing.
+Commands ran:
+Get-ADORganizationalUnit -Filter * | Select-Object Name, DistinguishedName
+--Trying to locate missing OU's.--
+
+Command wasn't recognized so ran:
+Get-Module -ListAvailable ActiveDirectory
+--Populated the ActiveDirectory module. which means it exists--
+
+Ran:
+Import-Module ActiveDirectory
+--supposed to import the module. it did not. so i fetched the commands directly with:
+
+Get-Command -Module ActiveDirectory | Where-Object Name -like :*OrganizationalUnit*"
+--which imported 4 previously unloaded cmdlets.--
+
+Explicit invoke to find the OUs, ran:
+ActiveDirectory\Get-ADOrganizationslUnits -Filter * | Select-Object Name, DistinguishedName
+--Nothing Populated...--
+
+used dcdiag with various options to confirm AD Health, DNS Health, Verified Replication, and configured Windows Time. 
+Determined Snapshot was taken before Custom OU's and Groups were created. Will repopulate and save again.
