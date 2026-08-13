@@ -1,0 +1,14 @@
+08-Client Endpoint
+Objective: 
+--Stand up an Windows 11 VM Client and join it to the domain.
+
+Method:
+--Downloaded fresh windows 11 ISO from microsoft
+--Verified file hash in powershell using  `Get-FileHash` followed by absolute path to ISO image, matching Output to Microsoft Provided Hash output. Files Matched.
+--verified Win11 Pro in VM installer.
+--Setup Network Adapters, one facing internet (NAT) and one facing host-dns (host-only adapter)
+--configured Windows 11 Pro language and preferences.
+--Esablished default user account
+--Updated windows
+--took clean save state snapshot of VM
+(more to come)
