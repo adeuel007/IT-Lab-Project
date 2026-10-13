@@ -31,3 +31,15 @@ This project is practice for managing an enterprise network simulation with an A
 
 - 08-Client Endpoint
     - Windows 11 Client VM Configuration
+
+## Lessons Learned
+
+What did you learn while building this project? What challenges did you face and how did you overcome them?
+
+Some Major Highlights from the project so far:
+- Multi-Homed Domain Controllers require careful DNS registration
+- Not every Event Viewer error represents an active problem. Context matters!
+- The dcdiag tool is a STARTING point for an investigation, not the final answer.
+- VM Stability can cascade into misleading services warnings.
+- A clean snapshot strategy saves an enormous amount of time while experimenting!
+- Separating internet-facing and domain networks closely mirrors enterprise design.
