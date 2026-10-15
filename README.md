@@ -2,6 +2,15 @@
 ## IT Home-Lab
 
 This project is practice for managing an enterprise network simulation with an Active Directory Home Lab. It uses Windows Server 2022 (Eval) inside Oracle VirtualBox VM's to establish a domain controller and endpoint(s) to manage, network and troubleshoot common issues.
+
+## Lab Environment
+
+**Hypervisor:** Oracle VirtualBox
+
+**Client:** Windows 11 (VirtualBox VM)
+
+**Server:** Windows Server 2022 Evaluation (VirtualBox VM)
+
 ## Roadmap
 
 - 01-planning
