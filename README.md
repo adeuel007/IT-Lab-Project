@@ -5,7 +5,7 @@ This project is practice for managing an enterprise network simulation with an A
 
 ## Lab Environment
 
-**Hypervisor:** Oracle VirtualBox
+**Hypervisor:** Oracle VirtualBox 7.2.14
 
 **Client:** Windows 11 (VirtualBox VM)
 
