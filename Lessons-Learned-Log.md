@@ -242,3 +242,243 @@ while the NAT adapter retained its normal Internet gateway:
 ```
 Subsequent DNS and domain-controller discovery tests succeeded.
 **Current status: DNS and domain-controller discovery are confirmed operational. The client is ready for the domain-join phase.** 🟢
+
+
+
+10/16/26 - "Life, finds a way" 
+
+Home Lab Documentation: LAB-DC01 Stabilization & LAB-WIN11 Domain Join
+Date: October 16, 2026
+Environment: Oracle VirtualBox 7.2.20
+Domain: lab.local
+Domain Controller: LAB-DC01
+Client: LAB-WIN11
+1. Objective
+The primary objective for this session was to stabilize the LAB-DC01 domain controller following repeated freezes and then proceed with joining LAB-WIN11 to the lab.local Active Directory domain.
+A secondary objective was to determine whether the previously observed instability was related to recent Windows Updates.
+2. Initial Problem
+Prior to this session, LAB-DC01 had experienced repeated progressive freezes.
+Observed behavior included:
+- Increasing system latency.
+- Windows becoming increasingly unresponsive.
+- Delayed or failed response to Ctrl+Alt+Delete.
+- VirtualBox itself remaining responsive while the guest OS became unusable.
+- ACPI shutdowns occasionally becoming stuck at:
+  - Shutting down service: Update Orchestrator Service
+  - Getting Windows ready. Don't turn off your computer.
+- Forced power-off eventually being required.
+- dcdiag /q subsequently reporting an unexpected shutdown event.
+The host system remained responsive during these incidents, making a host-wide system failure less likely.
+VirtualBox had also been upgraded from 7.2.14 to 7.2.20 during the troubleshooting process.
+The domain controller was subsequently configured with:
+- 8 GB RAM
+- 4 vCPUs
+- 100% execution cap
+- 80 GB VDI
+- SATA storage
+- NAT + Host-Only networking
+The increase from 2 to 4 vCPUs appeared to improve the duration of usable operation, but did not eliminate the freezing.
+3. Windows Update Investigation
+A major clue came from the timing of the instability.
+LAB-DC01 had previously been processing accumulated Windows Updates. During shutdown/reboot operations, the system repeatedly became stuck while interacting with the Update Orchestrator Service and subsequently displayed the Windows "Getting Windows ready" state.
+Because the system was becoming progressively less usable following the update activity, the decision was made to revert LAB-DC01 to a previously known-good VirtualBox snapshot.
+Result
+After reverting the snapshot:
+- LAB-DC01 successfully booted.
+- The system remained usable.
+- The previous severe latency/freezing was no longer immediately present.
+- The server remained stable for approximately 30 minutes during active use.
+This provides strong circumstantial evidence that the post-update state was involved in the instability, although it does not conclusively prove that a specific Windows Update was responsible.
+4. Server Manager Manageability Alert
+During validation, Server Manager displayed the following alert for LAB-DC01:
+Online - Cannot get role and feature data
+
+The server was displayed using both of its configured addresses:
+10.0.2.15
+192.168.10.10
+
+An attempt was made to investigate the management stack.
+One command initially generated:
+Get-Service : Cannot find any service with service name 'ServerManager'.
+
+This was determined not to be a server fault. ServerManager is not a Windows service and the command was therefore inappropriate for testing Server Manager itself.
+The server subsequently became progressively less responsive again during troubleshooting, so further investigation of the Server Manager alert was intentionally deferred.
+Decision
+The manageability alert was not treated as a blocker because the actual Active Directory, DNS, and domain-controller health checks could be independently validated.
+This was the correct priority: establish whether the core domain infrastructure works before chasing a management-console warning.
+5. Domain Controller Health Validation
+After reverting to the stable snapshot, the following validation checks were performed.
+5.1 Active Directory diagnostic
+Command:
+dcdiag /q
+
+Result
+PASS
+No outstanding AD diagnostic failures were reported.
+5.2 DNS diagnostic
+Command:
+dcdiag /test:dns /q
+
+Result
+PASS
+No outstanding DNS diagnostic failures were reported.
+5.3 Domain Controller Discovery
+Command:
+nltest /dsgetdc:lab.local
+
+Result
+PASS
+The domain controller was successfully discovered for:
+lab.local
+
+with LAB-DC01 serving as the domain controller.
+5.4 DNS Resolution
+Command:
+nslookup lab.local
+
+Result
+PASS
+The domain name successfully resolved through the lab DNS infrastructure.
+This confirmed that the client and domain controller were capable of resolving the Active Directory domain correctly.
+6. Network Configuration
+The lab network remains divided between the VirtualBox NAT network and the dedicated Host-Only lab network.
+LAB-DC01
+NAT adapter:
+10.0.2.15
+
+Lab Host-Only adapter:
+192.168.10.10/24
+
+LAB-WIN11
+NAT adapter:
+10.0.2.15
+
+Lab Host-Only adapter:
+192.168.10.20/24
+DNS:
+192.168.10.10
+
+The important configuration for Active Directory communication is the Host-Only network and the use of 192.168.10.10 as the client's DNS server.
+Earlier troubleshooting had already established that the client could:
+- Resolve lab.local.
+- Resolve LAB-DC01.
+- Communicate with the domain controller.
+Those conditions remained valid for today's domain join.
+7. Domain Join
+Once all health checks passed, LAB-WIN11 was joined to:
+lab.local
+
+The domain join completed successfully.
+This was the first successful domain join in the lab.
+8. Authentication Testing
+After rebooting the client, authentication was tested using both the administrative and standard employee accounts.
+Administrative account
+LAB\ynot.admin
+
+Result: PASS
+The account successfully authenticated against the domain.
+Standard employee account
+LAB\tony.employee
+
+Result: PASS
+The account successfully authenticated against the domain.
+9. What Today's Testing Proved
+Today's successful domain join is significantly more important than simply getting a Windows machine to log in.
+It demonstrates that the following pieces of the lab are functioning together:
+                 LAB.LOCAL
+                     │
+                     ▼
+               LAB-DC01
+             AD DS + DNS
+                     │
+          ┌──────────┴──────────┐
+          │                     │
+          ▼                     ▼
+    Domain Discovery       DNS Resolution
+          │                     │
+          └──────────┬──────────┘
+                     ▼
+                LAB-WIN11
+                     │
+                     ▼
+             Domain Authentication
+
+Specifically, we have demonstrated:
+- Active Directory Domain Services functioning.
+- DNS functioning.
+- Domain controller discovery functioning.
+- Client-to-DC network communication functioning.
+- Domain join functioning.
+- Domain authentication functioning.
+- Administrative domain authentication functioning.
+- Standard-user domain authentication functioning.
+The lab has officially progressed from "AD is installed" to "I have a functioning domain with a domain-joined Windows workstation."
+That is a meaningful milestone.
+10. Snapshots / Recovery Points
+A snapshot was taken after successfully establishing the domain-joined state.
+Recommended snapshot description:
+Domain Joined - Baseline
+
+Both virtual machines were then shut down for the evening.
+The current known-good recovery state therefore consists of:
+LAB-DC01
+Stable AD/DNS configuration
+Health checks passing
+Domain operational
+
+LAB-WIN11
+Windows 11 Pro
+Successfully joined to lab.local
+LAB\ynot.admin authentication confirmed
+LAB\tony.employee authentication confirmed
+
+11. Outstanding Issues
+The following items remain intentionally unresolved:
+Server Manager manageability warning
+Online - Cannot get role and feature data
+
+This should be investigated later, but it is not currently preventing normal AD functionality.
+Windows Update instability
+The exact cause of the previous freezing has not been definitively identified.
+Current evidence strongly suggests that the post-update state contributed to the problem because reverting to the earlier snapshot restored stability.
+However, this should be documented as:
+Suspected Windows Update-related instability, not confirmed root cause.
+
+Hypervisor/NEM investigation
+Previous troubleshooting established that Windows' hypervisor was active and VirtualBox was operating through the Windows hypervisor compatibility path. This remains a potential performance factor but was not demonstrated to be the root cause of the freezes.
+No destructive or invasive changes were made to address this.
+12. Current Lab Status
+Overall status: 🟢 Functional
+Component	Status
+VirtualBox 7.2.20	✅
+LAB-DC01 boots	✅
+AD DS	✅
+DNS	✅
+dcdiag /q	✅
+DNS diagnostic	✅
+DC discovery	✅
+LAB-WIN11 networking	✅
+Domain join	✅
+LAB\ynot.admin login	✅
+LAB\tony.employee login	✅
+Recovery snapshot	✅
+Server Manager manageability alert	⚠️ Deferred
+Windows Update instability	⚠️ Suspected, unresolved root cause
+
+
+13. Next Session
+The next session should not begin by changing the DC configuration.
+Recommended order:
+1. Boot LAB-DC01.
+2. Confirm it remains stable.
+3. Boot LAB-WIN11.
+4. Confirm domain authentication still works.
+5. Verify the computer object for LAB-WIN11 in Active Directory.
+6. Begin configuring Group Policy.
+7. Establish baseline security policies for the workstation.
+8. Begin building the lab toward Windows event logging and SOC-style investigation.
+The next major goal should be moving from infrastructure construction into security operations practice.
+Session conclusion
+October 16, 2026 successfully established the first functioning domain-joined workstation in the home lab.
+The previous instability was mitigated by reverting LAB-DC01 to a known-good snapshot. The resulting environment passed Active Directory and DNS validation, successfully joined LAB-WIN11 to lab.local, and successfully authenticated both a domain administrator and a standard domain user.
+Checkpoint reached: Domain infrastructure operational + Windows 11 endpoint successfully domain joined.
