@@ -1,8 +1,4 @@
 
-# Project Title
-
-A brief description of what this project does and who it's for
-
 # Phase 4: Active Directory Installation
 
 ## Objective
