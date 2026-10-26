@@ -2,7 +2,7 @@
 
 A hands-on enterprise network simulation built with Windows Server 2022 (Evaluation) and Windows 11 in Oracle VirtualBox. The lab stands up a domain controller and a domain-joined client to practice deploying, managing, and troubleshooting a typical Active Directory environment.
 
-**Status:** In Progress *(Last Update: 10/23/2026)*
+**Status:** Ongoing *(Last Update: 10/23/2026)*
 
 **Skills demonstrated:** Active Directory deployment, DNS configuration and troubleshooting, OU and group design, multi-homed network setup, VM stability diagnosis, snapshot-based change management.
 
