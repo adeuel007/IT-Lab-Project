@@ -10,7 +10,7 @@ A hands-on enterprise network simulation built with Windows Server 2022 (Evaluat
 
 | Component | Details |
 |---|---|
-| Hypervisor | Oracle VirtualBox 7.2.14 |
+| Hypervisor | Oracle VirtualBox 7.2.20 |
 | Server | Windows Server 2022 Evaluation (VM) |
 | Client | Windows 11 (VM) |
 | Network | Dual network: internet-facing and isolated domain network |
