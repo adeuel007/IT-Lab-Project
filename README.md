@@ -19,6 +19,7 @@ A hands-on enterprise network simulation built with Windows Server 2022 (Evaluat
 | LAB-DC01 (Server VM) | 8 GB RAM, 4 cores |
 | LAB-WIN11 (Client VM) | 6 GB RAM, 4 cores |
 
+## Network Topology
                    ┌───────────────────────────────┐
                    │       PHYSICAL HOST           │
                    │       Windows 11 Home         │
@@ -28,7 +29,7 @@ A hands-on enterprise network simulation built with Windows Server 2022 (Evaluat
                                   │
                     ┌─────────────┴─────────────┐
                     │                           │
-              NAT NETWORK                HOST-ONLY #2
+                   NAT                      HOST-ONLY
              Internet Access              Isolated Lab
               10.0.2.0/24                192.168.10.0/24
                     │                          │
@@ -49,8 +50,8 @@ A hands-on enterprise network simulation built with Windows Server 2022 (Evaluat
                               │ 192.168.10.10 │ │ 192.168.10.20 │
                               │ Static IP     │ │ Static IP     │
                               │               │ │               │
-                              │ AD DS + DNS   │ │ Domain Join   │
-                              │ lab.local     │ │  Successful!  │
+                              │ AD DS + DNS   │ │ Domain Joined │
+                              │ lab.local     │ │               │
                               └───────────────┘ └───────────────┘
 
 ## Walkthrough
